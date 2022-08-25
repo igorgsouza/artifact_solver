@@ -1,0 +1,1 @@
+add_library(library artifact.cpp stats.cpp artifact_build.cpp character.cpp generator.cpp evaluator.cpp)
