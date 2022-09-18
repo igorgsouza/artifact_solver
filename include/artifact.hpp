@@ -34,6 +34,8 @@ class Artifact
   public:
 	Artifact(TYPE);
 	std::string id();
+	std::string mainstat_str();
+
 	void id(std::string);
 	stat_block total();
 
@@ -41,4 +43,6 @@ class Artifact
 	void shuffle_main();
 	void shuffle_subs();
 	void shuffle_lvls();
+
+	std::map<STAT, int> tc_map();
 };

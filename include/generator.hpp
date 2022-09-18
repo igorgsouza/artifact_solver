@@ -7,14 +7,14 @@ class Generator
 
 	float max_value = 0;
 
-	void fill();
+	void fill(int);
 	void evaluate();
 
   public:
 	Generator(character);
-	int gen_size = 1000;
-	int max_gen = 1000000;
-	int max_idle = 200;
+	int gen_size = 500;
+	int max_gen = 2000;
+	int max_idle = 40;
 
 	character base;
 

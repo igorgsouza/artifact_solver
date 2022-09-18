@@ -13,12 +13,15 @@ class artifact_build
 	int shuffle_weight = 50;
 	int reset_weight = 10;
 
+	int shuffle_method = 0;
+
   public:
 	stat_block total();
 
 	void generate();
-	void mutate();
+	void mutate(int);
 	std::string id();
 	void id(std::string);
 	void shuffle(Artifact&);
+	std::string tc_id();
 };

@@ -6,13 +6,13 @@ Generator::Generator(character cha)
 	generation = new character[gen_size];
 }
 
-void Generator::fill()
+void Generator::fill(int iteration)
 {
 	generation[0] = base;
 	for (int i = 1; i < gen_size; ++i)
 	{
 		generation[i] = base;
-		generation[i].artifacts.mutate();
+		generation[i].artifacts.mutate(iteration + i - 1);
 	}
 }
 
@@ -38,7 +38,7 @@ artifact_build Generator::generate()
 	float old_best = max_value;
 	do
 	{
-		fill();
+		fill(iteration);
 		evaluate();
 		iteration++;
 		if (old_best == max_value)

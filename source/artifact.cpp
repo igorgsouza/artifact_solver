@@ -1,6 +1,6 @@
 #include <artifact.hpp>
 
-stat_block substat_level(STAT s, int lvl)
+stat_block maxsubstat_level(STAT s, int lvl)
 {
 	stat_block aux;
 	float mult = 0;
@@ -33,6 +33,92 @@ stat_block substat_level(STAT s, int lvl)
 			break;
 		case STAT::CD:
 			mult = 7.77;
+			break;
+		default:
+			aux[s] = 0;
+			break;
+	}
+	aux[s] = mult * (lvl + 1);
+
+	return aux;
+}
+
+stat_block medsubstat_level(STAT s, int lvl)
+{
+	stat_block aux;
+	float mult = 0;
+	switch (s)
+	{
+		case STAT::ATK_:
+		case STAT::HP_:
+			mult = 4.955;
+			break;
+		case STAT::HP:
+			mult = 253.94;
+			break;
+		case STAT::ATK:
+			mult = 16.535;
+			break;
+		case STAT::DEF_:
+			mult = 6.195;
+			break;
+		case STAT::DEF:
+			mult = 19.675;
+			break;
+		case STAT::EM:
+			mult = 19.815;
+			break;
+		case STAT::ER:
+			mult = 5.505;
+			break;
+		case STAT::CR:
+			mult = 3.305;
+			break;
+		case STAT::CD:
+			mult = 6.605;
+			break;
+		default:
+			aux[s] = 0;
+			break;
+	}
+	aux[s] = mult * (lvl + 1);
+
+	return aux;
+}
+
+stat_block minsubstat_level(STAT s, int lvl)
+{
+	stat_block aux;
+	float mult = 0;
+	switch (s)
+	{
+		case STAT::ATK_:
+		case STAT::HP_:
+			mult = 4.08;
+			break;
+		case STAT::HP:
+			mult = 209.13;
+			break;
+		case STAT::ATK:
+			mult = 13.62;
+			break;
+		case STAT::DEF_:
+			mult = 5.1;
+			break;
+		case STAT::DEF:
+			mult = 16.2;
+			break;
+		case STAT::EM:
+			mult = 16.32;
+			break;
+		case STAT::ER:
+			mult = 4.53;
+			break;
+		case STAT::CR:
+			mult = 2.72;
+			break;
+		case STAT::CD:
+			mult = 5.44;
 			break;
 		default:
 			aux[s] = 0;
@@ -92,6 +178,17 @@ stat_block mainstat_level(STAT s, int lvl = 20)
 	return aux;
 }
 
+std::map<STAT, int> Artifact::tc_map()
+{
+	std::map<STAT, int> substat_map;
+
+	for (int i = 0; i < 4; i++)
+	{
+		substat_map.insert(std::pair(sub_stat[i], sub_lvl[i] + 1));
+	}
+	return substat_map;
+}
+
 std::string Artifact::id()
 {
 	std::string aux;
@@ -100,7 +197,7 @@ std::string Artifact::id()
 	aux += stat_str(main_stat) + ":";
 	for (int i = 0; i < 4; i++)
 	{
-		substat_map.insert(std::pair(sub_stat[i], sub_lvl[i]));
+		substat_map.insert(std::pair(sub_stat[i], sub_lvl[i] + 1));
 	}
 
 	for (std::map<STAT, int>::iterator it = substat_map.begin();
@@ -117,7 +214,14 @@ stat_block Artifact::total()
 {
 	stat_block total = mainstat_level(main_stat);
 	for (int i = 0; i < 4; i++)
-		total += substat_level(sub_stat[i], sub_lvl[i]);
+	{
+		if (sub_stat[i] == main_stat)
+		{
+			stat_block zero;
+			return zero;
+		}
+		total += minsubstat_level(sub_stat[i], sub_lvl[i]);
+	}
 	return total;
 }
 
@@ -369,7 +473,12 @@ void Artifact::id(std::string id)
 				break;
 
 		sub_stat[i] = str_stat(id.substr(0, sep));
-		sub_lvl[i] = (int)id[sep] - 48;
+		sub_lvl[i] = (int)id[sep] - 48 - 1;
 		id.erase(0, sep + 1);
 	}
+}
+
+std::string Artifact::mainstat_str()
+{
+	return stat_str(main_stat);
 }
