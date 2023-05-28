@@ -1,5 +1,7 @@
 #include <artifact.hpp>
 
+#define LVLCOUNT 0
+
 stat_block maxsubstat_level(STAT s, int lvl)
 {
 	stat_block aux;
@@ -220,7 +222,7 @@ stat_block Artifact::total()
 			stat_block zero;
 			return zero;
 		}
-		total += minsubstat_level(sub_stat[i], sub_lvl[i]);
+		total += maxsubstat_level(sub_stat[i], sub_lvl[i]);
 	}
 	return total;
 }
@@ -241,6 +243,7 @@ Artifact::Artifact(TYPE type)
 			       STAT::EM,
 			       STAT::CR,
 			       STAT::CD};
+			main_stat = STAT::HP;
 			break;
 		case TYPE::POD:
 			main = {STAT::ATK};
@@ -253,6 +256,7 @@ Artifact::Artifact(TYPE type)
 			       STAT::EM,
 			       STAT::CR,
 			       STAT::CD};
+			main_stat = STAT::ATK;
 			break;
 		case TYPE::SOE:
 			main = {STAT::HP_,
@@ -319,55 +323,21 @@ void Artifact::generate()
 {
 	std::string current = id();
 
-	int remaining = 5;
-	for (int i = 0; i < 4; ++i)
-		sub_lvl[i] = 0;
+	shuffle_main();
+	shuffle_subs();
+	shuffle_lvls();
 
-	std::random_device dev;
-	std::mt19937 rng(dev());
-	while (remaining != 0)
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			std::uniform_int_distribution<> dist(0, remaining);
-			int r = dist(rng);
-			remaining -= r;
-			sub_lvl[i] += r;
-		}
-	}
-
-	std::uniform_int_distribution<> distmain(0, main.size() - 1);
-
-	auto it = std::begin(main);
-
-	std::advance(it, distmain(rng));
-
-	main_stat = *it;
-
-	std::set<STAT> aux = sub;
-
-	it = aux.find(main_stat);
-	if (it != aux.end())
-		aux.erase(it);
-
-	for (int i = 0; i < 4; ++i)
-	{
-		std::uniform_int_distribution<> distsub(0, aux.size() - 1);
-
-		it = std::begin(aux);
-		std::advance(it, distsub(rng));
-		sub_stat[i] = *it;
-		aux.erase(it);
-	}
-
-	if (current == id())
+	if (id() == current)
 		generate();
 }
 
 void Artifact::shuffle_main()
 {
-	if (main.size() < 2)
+	if (main_stat == STAT::ATK || main_stat == STAT::HP)
+	{
+		shuffle_subs();
 		return;
+	}
 
 	std::set<STAT> aux = main;
 
@@ -438,7 +408,7 @@ void Artifact::shuffle_subs()
 void Artifact::shuffle_lvls()
 {
 	std::string current = id();
-	int remaining = 5;
+	int remaining = LVLCOUNT;
 	for (int i = 0; i < 4; ++i)
 		sub_lvl[i] = 0;
 
@@ -457,7 +427,7 @@ void Artifact::shuffle_lvls()
 		}
 	}
 
-	if (current == id())
+	if (current == id() && LVLCOUNT != 0)
 		shuffle_lvls();
 }
 

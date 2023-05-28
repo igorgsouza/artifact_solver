@@ -14,7 +14,7 @@ class Generator
 	Generator(character);
 	int gen_size = 500;
 	int max_gen = 2000;
-	int max_idle = 40;
+	int max_idle = 100;
 
 	character base;
 
